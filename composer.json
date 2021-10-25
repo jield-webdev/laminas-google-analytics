@@ -1,5 +1,5 @@
 {
-    "name": "laminas/google-analytics",
+    "name": "jield-webdev/laminas-google-analytics",
     "description": "Google Analytics tracking integration for Laminas",
     "license": "GPL-3.0-or-later",
     "type": "library",
