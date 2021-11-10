@@ -14,7 +14,7 @@ final class Module implements
 
     public function getConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        return include __DIR__ . '/../config/module.config.php';
     }
 
     /**
@@ -34,8 +34,8 @@ final class Module implements
         $sm = $app->getServiceManager();
         $em = $app->getEventManager();
 
-        $em->attach(MvcEvent::EVENT_RENDER, function(MvcEvent $e) use ($sm) {
-            $view   = $sm->get('ViewHelperManager');
+        $em->attach(MvcEvent::EVENT_RENDER, function (MvcEvent $e) use ($sm) {
+            $view = $sm->get('ViewHelperManager');
             $plugin = $view->get('googleAnalytics');
             $plugin->appendScript();
         });
