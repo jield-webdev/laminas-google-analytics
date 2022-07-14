@@ -2,12 +2,12 @@
 
 namespace LaminasGoogleAnalytics;
 
-use Laminas\ModuleManager\Feature\ConfigProviderInterface;
-use Laminas\ModuleManager\Feature\BootstrapListenerInterface;
 use Laminas\EventManager\EventInterface;
 use Laminas\Http\Request as HttpRequest;
-use Laminas\ModuleManager\Feature;
+use Laminas\ModuleManager\Feature\BootstrapListenerInterface;
+use Laminas\ModuleManager\Feature\ConfigProviderInterface;
 use Laminas\Mvc\MvcEvent;
+use LaminasGoogleAnalytics\View\Helper\GoogleAnalytics;
 
 final class Module implements
     ConfigProviderInterface,
@@ -19,13 +19,7 @@ final class Module implements
         return include __DIR__ . '/../config/module.config.php';
     }
 
-    /**
-     * When the render event is triggered, we invoke the view helper to
-     * render the javascript code.
-     *
-     * @param MvcEvent $e
-     */
-    public function onBootstrap(EventInterface $e)
+    public function onBootstrap(EventInterface $e): void
     {
         $app = $e->getParam('application');
 
@@ -38,6 +32,7 @@ final class Module implements
 
         $em->attach(MvcEvent::EVENT_RENDER, function (MvcEvent $e) use ($sm) {
             $view = $sm->get('ViewHelperManager');
+            /** @var GoogleAnalytics $plugin */
             $plugin = $view->get('googleAnalytics');
             $plugin->appendScript();
         });

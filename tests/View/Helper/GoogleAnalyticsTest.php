@@ -21,7 +21,7 @@ class GoogleAnalyticsTest extends TestCase
             ->method('getCode')
             ->will($this->returnValue('foo'));
 
-        $helper = new Helper($script);
+        $helper = new Helper($script, 1234);
         $view = new PhpRenderer;
         $helper->setView($view);
 
