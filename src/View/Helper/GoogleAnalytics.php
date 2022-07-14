@@ -9,11 +9,11 @@ use LaminasGoogleAnalytics\View\Helper\Script\ScriptInterface;
 
 class GoogleAnalytics extends AbstractHelper
 {
-    protected string $containerName = 'InlineScript';
+    protected string $containerName = 'HeadScript';
 
     protected bool $rendered = false;
 
-    public function __construct(protected ScriptInterface $script)
+    public function __construct(protected ScriptInterface $script, protected string $id)
     {
     }
 
@@ -57,6 +57,12 @@ class GoogleAnalytics extends AbstractHelper
                 )
             );
         }
+
+        $container->appendFile(
+            '//www.googletagmanager.com/gtag/js?id=' . $this->id,
+            'text/javascript',
+            ['async' => true]
+        );
 
         $code = $this->script->getCode();
 

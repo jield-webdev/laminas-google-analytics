@@ -7,5 +7,6 @@ use LaminasGoogleAnalytics\Analytics\Tracker;
 interface ScriptInterface
 {
     public function setTracker(Tracker $tracker);
-    public function getCode();
+
+    public function getCode(): ?string;
 }
