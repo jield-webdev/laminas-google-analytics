@@ -17,6 +17,6 @@ class TrackerTest extends TestCase
     public function testIsEnabledByDefault(): void
     {
         $tracker = new Tracker(123);
-        $this->assertTrue($tracker->enabled());
+        $this->assertTrue($tracker->isEnabled());
     }
 }

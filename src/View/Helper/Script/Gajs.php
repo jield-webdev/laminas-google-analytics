@@ -23,7 +23,7 @@ class Gajs implements ScriptInterface
     public function getCode(): ?string
     {
         // Do not render when tracker is disabled
-        if (!$this->tracker->enabled()) {
+        if (!$this->tracker->isEnabled()) {
             return null;
         }
 
