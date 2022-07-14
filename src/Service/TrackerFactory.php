@@ -13,6 +13,6 @@ final class TrackerFactory implements FactoryInterface
         $config = $container->get('config');
         $gaConfig = $config['google_analytics'];
 
-        return new Tracker($gaConfig['id']);
+        return new Tracker($gaConfig['id'], $gaConfig['enable']);
     }
 }

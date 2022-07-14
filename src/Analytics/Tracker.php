@@ -7,8 +7,6 @@ use LaminasGoogleAnalytics\Exception\InvalidArgumentException;
 
 class Tracker
 {
-    protected bool $enableTracking = true;
-
     protected array $customVariables = [];
 
     protected array $events = [];
@@ -17,7 +15,7 @@ class Tracker
 
     protected ?string $pageUrl = null;
 
-    public function __construct(protected string $id)
+    public function __construct(protected string $id, protected bool $enableTracking = true)
     {
     }
 
@@ -31,11 +29,11 @@ class Tracker
         $this->id = (string)$id;
     }
 
-    public function enabled(): bool
+    public function isEnabled(): bool
     {
         return $this->enableTracking;
     }
-    
+
     public function getCustomVariables(): array
     {
         return $this->customVariables;
