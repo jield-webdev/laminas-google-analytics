@@ -15,7 +15,7 @@ $googleAnalytics = [
     /**
      * Disable/enable page tracking
      *
-     * It is adviced to turn off tracking in a development/staging environment. Put this
+     * It is advised to turn off tracking in a development/staging environment. Put this
      * configuration option in your local.php in the autoload folder and set "enable" to
      * false.
      */
