@@ -4,56 +4,55 @@ namespace LaminasGoogleAnalytics\Analytics;
 
 class Event
 {
-    protected $category;
-    protected $action;
-    protected $label;
-    protected $value;
-
-    public function __construct($category, $action, $label = null, $value = null)
-    {
-        $this->setCategory($category);
-        $this->setAction($action);
-        $this->setLabel($label);
-        $this->setValue($value);
+    public function __construct(
+        protected string $category,
+        protected string $action,
+        protected ?string $label = null,
+        protected ?string $value = null
+    ) {
     }
 
-    public function getCategory()
+    public function getCategory(): string
     {
         return $this->category;
     }
 
-    public function setCategory($category): void
+    public function setCategory(string $category): Event
     {
         $this->category = $category;
+        return $this;
     }
 
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
 
-    public function setAction($action): void
+    public function setAction(string $action): Event
     {
         $this->action = $action;
+        return $this;
     }
 
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
 
-    public function setLabel($label): void
+    public function setLabel(?string $label): Event
     {
         $this->label = $label;
+        return $this;
     }
 
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    public function setValue($value): void
+    public function setValue(?string $value): Event
     {
         $this->value = $value;
+        return $this;
     }
 }

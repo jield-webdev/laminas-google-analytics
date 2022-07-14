@@ -3,38 +3,40 @@
 namespace LaminasGoogleAnalytics\View\Helper\Script;
 
 use Laminas\Json\Json;
-use LaminasGoogleAnalytics\Analytics\Event;
-use LaminasGoogleAnalytics\Analytics\Tracker;
 use LaminasGoogleAnalytics\Analytics\Ecommerce\Item;
 use LaminasGoogleAnalytics\Analytics\Ecommerce\Transaction;
+use LaminasGoogleAnalytics\Analytics\Event;
+use LaminasGoogleAnalytics\Analytics\Tracker;
 
 class Analyticsjs implements ScriptInterface
 {
     public const DEFAULT_FUNCTION_NAME = 'ga';
 
-    protected        $tracker;
-    protected string $function      = self::DEFAULT_FUNCTION_NAME;
-    protected array  $loadedPlugins = array();
+    protected Tracker $tracker;
 
-    public function setTracker(Tracker $tracker)
+    protected string $function = self::DEFAULT_FUNCTION_NAME;
+
+    protected array $loadedPlugins = [];
+
+    public function setTracker(Tracker $tracker): Analyticsjs
     {
         $this->tracker = $tracker;
+
+        return $this;
     }
 
     protected function callGa(array $params): string
     {
-        $jsArray         = Json::encode($params);
+        $jsArray = Json::encode($params);
         $jsArrayAsParams = substr($jsArray, 1, -1);
-        $output          = sprintf("\n" . '%s(%s);', $this->getFunctionName(), $jsArrayAsParams);
-
-        return $output;
+        return sprintf("\n" . '%s(%s);', $this->getFunctionName(), $jsArrayAsParams);
     }
 
-    public function getCode()
+    public function getCode(): ?string
     {
         // Do not render when tracker is disabled
         if (!$this->tracker->enabled()) {
-            return;
+            return null;
         }
 
         $script = $this->getLoadScript();
@@ -47,11 +49,6 @@ class Analyticsjs implements ScriptInterface
         $script .= $this->prepareSend();
 
         return $script;
-    }
-
-    public function setFunctionName($name): void
-    {
-        $this->function = $name;
     }
 
     public function getFunctionName(): string
@@ -76,10 +73,7 @@ SCRIPT;
         $output = '';
 
         if (isset($this->loadedPlugins[$name]) === false) {
-            $params = array(
-                'require',
-                $name,
-            );
+            $params = ['require', $name];
 
             if ($scriptName !== null) {
                 $params[] = $scriptName;
@@ -93,12 +87,8 @@ SCRIPT;
 
     protected function prepareCreate(): string
     {
-        $parameters = array();
-        $params     = array(
-            'create',
-            $this->tracker->getId(),
-        );
-
+        $parameters = [];
+        $params = ['create', $this->tracker->getId()];
 
         if ($this->tracker->getAllowLinker()) {
             $parameters['allowLinker'] = true;
@@ -121,11 +111,8 @@ SCRIPT;
             return '';
         }
 
-        $parameters = array();
-        $params     = array(
-            'send',
-            'pageview',
-        );
+        $parameters = [];
+        $params = ['send', 'pageview'];
 
         $pageUrl = $this->tracker->getPageUrl();
 
@@ -135,10 +122,10 @@ SCRIPT;
 
         $customVariables = $this->tracker->getCustomVariables();
 
-        if (count($customVariables) > 0) {
+        if ((is_countable($customVariables) ? count($customVariables) : 0) > 0) {
             foreach ($customVariables as $customVariable) {
                 $index = $customVariable->getIndex();
-                $key   = 'dimension' . $index;
+                $key = 'dimension' . $index;
                 $value = $customVariable->getValue();
 
                 $parameters[$key] = $value;
@@ -155,15 +142,12 @@ SCRIPT;
     protected function prepareLinker(): string
     {
         $domainName = $this->tracker->getDomainName();
-        $output     = '';
+        $output = '';
 
         if ($domainName) {
             $output .= $this->requirePlugin('linker');
 
-            $params = array(
-                'linker:autoLink',
-                array($domainName),
-            );
+            $params = ['linker:autoLink', [$domainName]];
 
             $output .= $this->callGa($params);
         }
@@ -194,12 +178,7 @@ SCRIPT;
 
     protected function prepareTrackEvent(Event $event): string
     {
-        $params = array(
-            'send',
-            'event',
-            $event->getCategory(),
-            $event->getAction(),
-        );
+        $params = ['send', 'event', $event->getCategory(), $event->getAction()];
 
         $label = $event->getLabel();
 
@@ -212,16 +191,15 @@ SCRIPT;
             }
         }
 
-
         return $this->callGa($params);
     }
 
     protected function prepareTransactions(): string
     {
         $transactions = $this->tracker->getTransactions();
-        $output       = '';
+        $output = '';
 
-        $hasTransactions = count($transactions) > 0;
+        $hasTransactions = (is_countable($transactions) ? count($transactions) : 0) > 0;
 
         if ($hasTransactions) {
             $output .= $this->requirePlugin('ecommerce', 'ecommerce.js');
@@ -233,16 +211,14 @@ SCRIPT;
         }
 
         if ($hasTransactions) {
-            $output .= $this->callGa(array('ecommerce:send'));
+            $output .= $this->callGa(['ecommerce:send']);
         }
         return $output;
     }
 
     protected function prepareTransaction(Transaction $transaction): string
     {
-        $transactionParams = array(
-            'id' => $transaction->getId(),
-        );
+        $transactionParams = ['id' => $transaction->getId()];
 
         $affiliation = $transaction->getAffiliation();
         if ($affiliation !== null) {
@@ -264,10 +240,7 @@ SCRIPT;
             $transactionParams['tax'] = $tax;
         }
 
-        $params = array(
-            'ecommerce:addTransaction',
-            $transactionParams,
-        );
+        $params = ['ecommerce:addTransaction', $transactionParams];
 
         return $this->callGa($params);
     }
@@ -275,7 +248,7 @@ SCRIPT;
     protected function prepareTransactionItems(Transaction $transaction): string
     {
         $output = '';
-        $items  = $transaction->getItems();
+        $items = $transaction->getItems();
 
         foreach ($items as $item) {
             $output .= $this->prepareTransactionItem($transaction, $item);
@@ -285,10 +258,7 @@ SCRIPT;
 
     protected function prepareTransactionItem(Transaction $transaction, Item $item): string
     {
-        $itemParams = array(
-            'id'   => $transaction->getId(),
-            'name' => $item->getProduct(),
-        );
+        $itemParams = ['id' => $transaction->getId(), 'name' => $item->getProduct()];
 
         $sku = $item->getSku();
         if ($sku !== null) {
@@ -310,10 +280,7 @@ SCRIPT;
             $itemParams['quantity'] = $quantity;
         }
 
-        $params = array(
-            'ecommerce:addItem',
-            $itemParams,
-        );
+        $params = ['ecommerce:addItem', $itemParams];
 
         return $this->callGa($params);
     }

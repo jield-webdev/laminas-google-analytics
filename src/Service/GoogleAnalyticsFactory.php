@@ -45,7 +45,7 @@ use LaminasGoogleAnalytics\View\Helper\GoogleAnalytics;
 
 final class GoogleAnalyticsFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): GoogleAnalytics
     {
         $script = $container->get(ScriptFactory::class);
         $helper = new GoogleAnalytics($script);

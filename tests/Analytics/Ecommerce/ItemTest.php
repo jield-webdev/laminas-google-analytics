@@ -37,16 +37,17 @@
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://juriansluiman.nl
  */
+
 namespace LaminasGoogleAnalyticsTest\Analytics\Ecommerce;
 
-use PHPUnit_Framework_TestCase as TestCase;
 use LaminasGoogleAnalytics\Analytics\Ecommerce\Item;
 use LaminasGoogleAnalytics\Analytics\Ecommerce\Transaction;
+use PHPUnit\Framework\TestCase;
 
 class ItemTest extends TestCase
 {
 
-    public function testCanInstantiateItem()
+    public function testCanInstantiateItem(): void
     {
         $item = new Item(123, 12.50, 1);
 
@@ -55,38 +56,38 @@ class ItemTest extends TestCase
         $this->assertEquals(1, $item->getQuantity());
     }
 
-    public function testCanAddItemToTransaction()
+    public function testCanAddItemToTransaction(): void
     {
-        $item        = new Item(123, 12.50, 1);
+        $item = new Item(123, 12.50, 1);
         $transaction = new Transaction(1, 12.50);
         $transaction->addItem($item);
 
-        $items = count($transaction->getItems());
+        $items = is_countable($transaction->getItems()) ? count($transaction->getItems()) : 0;
         $this->assertEquals(1, $items);
     }
 
-    public function testCanAddItemsToTransaction()
+    public function testCanAddItemsToTransaction(): void
     {
-        $item1       = new Item(123, 12.50, 1);
-        $item2       = new Item(456, 22.80, 1);
+        $item1 = new Item(123, 12.50, 1);
+        $item2 = new Item(456, 22.80, 1);
         $transaction = new Transaction(1, 12.50);
         $transaction->addItem($item1);
         $transaction->addItem($item2);
 
-        $items = count($transaction->getItems());
+        $items = is_countable($transaction->getItems()) ? count($transaction->getItems()) : 0;
         $this->assertEquals(2, $items);
     }
 
-    public function testCanAddSameSkuMoreThanOnce()
+    public function testCanAddSameSkuMoreThanOnce(): void
     {
-        $item1       = new Item(123, 12.50, 1);
-        $item2       = new Item(123, 22.80, 1);
+        $item1 = new Item(123, 12.50, 1);
+        $item2 = new Item(123, 22.80, 1);
         $transaction = new Transaction(1, 12.50);
         $transaction->addItem($item1);
         $transaction->addItem($item2);
 
         $items = $transaction->getItems();
-        $this->assertEquals(1, count($items));
+        $this->assertEquals(1, is_countable($items) ? count($items) : 0);
 
         $item = reset($items);
         $this->assertEquals(2, $item->getQuantity());

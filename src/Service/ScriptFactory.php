@@ -37,22 +37,18 @@
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.psd2html.pl
  */
+
 namespace LaminasGoogleAnalytics\Service;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use LaminasGoogleAnalytics\View\Helper\Script\ScriptInterface;
 
-/**
- * Class ScriptFactory
- *
- * @package LaminasGoogleAnalytics\Service
- */
-class ScriptFactory implements FactoryInterface
+final class ScriptFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): ScriptInterface
     {
-        $config     = $container->get('config');
+        $config = $container->get('config');
         $scriptName = $config['google_analytics']['script'];
 
         $script = $container->get($scriptName);

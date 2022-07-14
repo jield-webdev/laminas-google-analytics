@@ -2,14 +2,16 @@
 
 namespace LaminasGoogleAnalytics;
 
+use Laminas\ModuleManager\Feature\ConfigProviderInterface;
+use Laminas\ModuleManager\Feature\BootstrapListenerInterface;
 use Laminas\EventManager\EventInterface;
 use Laminas\Http\Request as HttpRequest;
 use Laminas\ModuleManager\Feature;
 use Laminas\Mvc\MvcEvent;
 
 final class Module implements
-    Feature\ConfigProviderInterface,
-    Feature\BootstrapListenerInterface
+    ConfigProviderInterface,
+    BootstrapListenerInterface
 {
 
     public function getConfig()

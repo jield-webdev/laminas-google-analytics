@@ -1,4 +1,6 @@
 composer.lock
+.phpunit.result.cache
 .idea
 vendor/
 bin/
+/.phpunit.cache/test-results

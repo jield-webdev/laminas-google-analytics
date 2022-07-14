@@ -3,11 +3,11 @@
 namespace LaminasGoogleAnalytics\View\Helper\Script;
 
 use Laminas\Json\Encoder;
-use LaminasGoogleAnalytics\Analytics\Tracker;
 use LaminasGoogleAnalytics\Analytics\CustomVariable;
-use LaminasGoogleAnalytics\Analytics\Ecommerce\Transaction;
 use LaminasGoogleAnalytics\Analytics\Ecommerce\Item;
+use LaminasGoogleAnalytics\Analytics\Ecommerce\Transaction;
 use LaminasGoogleAnalytics\Analytics\Event;
+use LaminasGoogleAnalytics\Analytics\Tracker;
 
 class Gajs implements ScriptInterface
 {
@@ -15,16 +15,18 @@ class Gajs implements ScriptInterface
 
     protected Tracker $tracker;
 
-    public function setTracker(Tracker $tracker)
+    public function setTracker(Tracker $tracker): Gajs
     {
         $this->tracker = $tracker;
+
+        return $this;
     }
 
-    public function getCode()
+    public function getCode(): ?string
     {
         // Do not render when tracker is disabled
         if (!$this->tracker->enabled()) {
-            return;
+            return null;
         }
 
         $script = $this->getVarCreate();
@@ -63,21 +65,19 @@ SCRIPT;
 
     protected function getVarCreate(): string
     {
-        return 'var _gaq = _gaq || [];'."\n";
+        return 'var _gaq = _gaq || [];' . "\n";
     }
 
-    protected function push($methodName, array $params = array()): string
+    protected function push($methodName, array $params = []): string
     {
         array_unshift($params, self::METHOD_PREFIX . $methodName);
         $jsArray = Encoder::encode($params);
-        $output  = sprintf('_gaq.push(%s);' . "\n", $jsArray);
-
-        return $output;
+        return sprintf('_gaq.push(%s);' . "\n", $jsArray);
     }
 
     protected function prepareSetAccount(): string
     {
-        return $this->push('setAccount', array($this->tracker->getId()));
+        return $this->push('setAccount', [$this->tracker->getId()]);
     }
 
     protected function prepareSetDomain(): string
@@ -85,7 +85,7 @@ SCRIPT;
         $domainName = $this->tracker->getDomainName();
 
         if ($domainName) {
-            return $this->push('setDomainName', array($domainName));
+            return $this->push('setDomainName', [$domainName]);
         }
         return '';
     }
@@ -93,7 +93,7 @@ SCRIPT;
     protected function prepareSetAllowLinker(): string
     {
         if ($this->tracker->getAllowLinker()) {
-            return $this->push('setAllowLinker', array(true));
+            return $this->push('setAllowLinker', [true]);
         }
         return '';
     }
@@ -109,7 +109,7 @@ SCRIPT;
     protected function prepareCustomVariables(): string
     {
         $customVariables = $this->tracker->getCustomVariables();
-        $output          = '';
+        $output = '';
 
         foreach ($customVariables as $variable) {
             $output .= $this->prepareCustomVariable($variable);
@@ -119,12 +119,12 @@ SCRIPT;
 
     protected function prepareCustomVariable(CustomVariable $customVariable): string
     {
-        $data = array(
+        $data = [
             $customVariable->getIndex(),
             $customVariable->getName(),
             $customVariable->getValue(),
-            $customVariable->getScope(),
-        );
+            $customVariable->getScope()
+        ];
 
         return $this->push('setCustomVar', $data);
     }
@@ -134,10 +134,10 @@ SCRIPT;
         if ($this->tracker->enabledPageTracking()) {
             $pageUrl = $this->tracker->getPageUrl();
             if ($pageUrl !== null) {
-                return $this->push('trackPageview', array($pageUrl));
-            } else {
-                return $this->push('trackPageview');
+                return $this->push('trackPageview', [$pageUrl]);
             }
+
+            return $this->push('trackPageview');
         }
         return '';
     }
@@ -155,18 +155,16 @@ SCRIPT;
 
     protected function prepareTrackEvent(Event $event): string
     {
-        return $this->push('trackEvent', array(
-            $event->getCategory(),
-            $event->getAction(),
-            $event->getLabel(),
-            $event->getValue(),
-        ));
+        return $this->push(
+            'trackEvent',
+            [$event->getCategory(), $event->getAction(), $event->getLabel(), $event->getValue()]
+        );
     }
 
     protected function prepareTransactions(): string
     {
         $transactions = $this->tracker->getTransactions();
-        $output       = '';
+        $output = '';
 
         foreach ($transactions as $transaction) {
             $output .= $this->prepareTransaction($transaction);
@@ -179,22 +177,25 @@ SCRIPT;
 
     protected function prepareTransaction(Transaction $transaction): string
     {
-        return $this->push('addTrans', array(
-            $transaction->getId(),
-            $transaction->getAffiliation(),
-            $transaction->getTotal(),
-            $transaction->getTax(),
-            $transaction->getShipping(),
-            $transaction->getCity(),
-            $transaction->getState(),
-            $transaction->getCountry(),
-        )) . $this->prepareTransactionItems($transaction);
+        return $this->push(
+                'addTrans',
+                [
+                    $transaction->getId(),
+                    $transaction->getAffiliation(),
+                    $transaction->getTotal(),
+                    $transaction->getTax(),
+                    $transaction->getShipping(),
+                    $transaction->getCity(),
+                    $transaction->getState(),
+                    $transaction->getCountry()
+                ]
+            ) . $this->prepareTransactionItems($transaction);
     }
 
     protected function prepareTransactionItems(Transaction $transaction): string
     {
         $output = '';
-        $items  = $transaction->getItems();
+        $items = $transaction->getItems();
 
         foreach ($items as $item) {
             $output .= $this->prepareTransactionItem($transaction, $item);
@@ -204,13 +205,16 @@ SCRIPT;
 
     protected function prepareTransactionItem(Transaction $transaction, Item $item): string
     {
-        return $this->push('addItem', array(
-            $transaction->getId(),
-            $item->getSku(),
-            $item->getProduct(),
-            $item->getCategory(),
-            $item->getPrice(),
-            $item->getQuantity(),
-        ));
+        return $this->push(
+            'addItem',
+            [
+                $transaction->getId(),
+                $item->getSku(),
+                $item->getProduct(),
+                $item->getCategory(),
+                $item->getPrice(),
+                $item->getQuantity()
+            ]
+        );
     }
 }

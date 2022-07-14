@@ -38,18 +38,11 @@
  * @link        http://juriansluiman.nl
  */
 
-chdir(__DIR__);
-$previousDir = '.';
-while (!is_dir($previousDir . DIRECTORY_SEPARATOR . 'vendor')) {
-    $appRoot = dirname(getcwd());
+namespace LaminasGoogleAnalyticsTest\View\Helper\TestAsset;
 
-    if ($previousDir === $appRoot) {
-        throw new RuntimeException('Unable to locate application root');
-    }
+use Laminas\View\Helper\AbstractHelper;
 
-    $previousDir = $appRoot;
-    chdir($appRoot);
+class CustomViewHelper extends AbstractHelper
+{
+
 }
-
-// Load composer autoloader
-require_once $appRoot . '/vendor/autoload.php';

@@ -6,80 +6,75 @@ use LaminasGoogleAnalytics\Exception\InvalidArgumentException;
 
 class CustomVariable
 {
-    const SCOPE_VISITOR    = 1;
-    const SCOPE_SESSION    = 2;
-    const SCOPE_PAGE_LEVEL = 3;
+    public const SCOPE_VISITOR = 1;
+    public const SCOPE_SESSION = 2;
+    public const SCOPE_PAGE_LEVEL = 3;
 
-    protected $index;
-    protected $name;
-    protected $value;
-    protected $scope;
+    protected string $scope;
 
-    public function __construct($index, $name, $value, $scope = self::SCOPE_PAGE_LEVEL)
-    {
-        $this->setIndex($index);
-        $this->setName($name);
-        $this->setValue($value);
+    public function __construct(
+        protected int $index,
+        protected string $name,
+        protected string $value,
+        $scope = self::SCOPE_PAGE_LEVEL
+    ) {
         $this->setScope($scope);
     }
 
-    public function setIndex($index)
-    {
-        if (!is_int($index)) {
-            throw new InvalidArgumentException(sprintf(
-                'Index must be of type integer, %s given',
-                gettype($index)
-            ));
-        }
-
-        $this->index = $index;
-    }
-
-    public function getIndex()
+    public function getIndex(): int
     {
         return $this->index;
     }
 
-    public function setName($name)
+    public function setIndex(int $index): CustomVariable
     {
-        $this->name = $name;
+        $this->index = $index;
+        return $this;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function setValue($value)
+    public function setName(string $name): CustomVariable
     {
-        $this->value = $value;
+        $this->name = $name;
+        return $this;
     }
 
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
 
-    public function setScope($scope)
+    public function setValue(string $value): CustomVariable
     {
-        $allowed = array(
-            self::SCOPE_VISITOR,
-            self::SCOPE_SESSION,
-            self::SCOPE_PAGE_LEVEL
-        );
+        $this->value = $value;
+        return $this;
+    }
+
+    public function setScope(int $scope): CustomVariable
+    {
+        $allowed = [self::SCOPE_VISITOR, self::SCOPE_SESSION, self::SCOPE_PAGE_LEVEL];
 
         if (!in_array($scope, $allowed, true)) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid value given for scope. Acceptable values are: %s.',
-                implode(', ', $allowed)
-            ));
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Invalid value given for scope. Acceptable values are: %s.',
+                    implode(', ', $allowed)
+                )
+            );
         }
 
         $this->scope = $scope;
+
+        return $this;
     }
 
-    public function getScope()
+    public function getScope(): string
     {
         return $this->scope;
     }
+
 }

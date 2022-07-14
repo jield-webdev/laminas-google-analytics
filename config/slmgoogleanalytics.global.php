@@ -1,11 +1,12 @@
 <?php
+
 /**
  * LaminasGoogleAnalytics Configuration
  *
  * If you have a ./configs/autoload/ directory set up for your project, you can
  * drop this config file in it and change the values as you wish.
  */
-$googleAnalytics = array(
+$googleAnalytics = [
     /**
      * Web property ID (something like UA-xxxxx-x)
      */
@@ -49,7 +50,7 @@ $googleAnalytics = array(
     /**
      * Enable Google's Analytics Display Advertising features
      *
-     * Display Adversiting includes the following:
+     * Display Advertising includes the following:
      * - Demographics and Interests reporting
      * - Remarketing with Google Analytics
      * - DoubleClick Campaign Manager integration (for Google Analytics Premium)
@@ -62,9 +63,9 @@ $googleAnalytics = array(
      * Set the container name to be used for the Google Analytics code
      */
     //'container_name' => 'InlineScript',
-);
+];
 
 /**
  * You do not need to edit below this line
  */
-return array('google_analytics' => $googleAnalytics);
+return ['google_analytics' => $googleAnalytics];

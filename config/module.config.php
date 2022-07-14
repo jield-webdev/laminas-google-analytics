@@ -1,71 +1,37 @@
 <?php
-/**
- * Copyright (c) 2012-2013 Jurian Sluiman.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *
- *   * Neither the names of the copyright holders nor the names of the
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @author      Jurian Sluiman <jurian@juriansluiman.nl>
- * @copyright   2012-2013 Jurian Sluiman.
- * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link        http://juriansluiman.nl
- */
 
-return array(
-    'google_analytics' => array(
-        'enable'                     => true,
-        'id'                         => '',
-        'domain_name'                => '',
-        'allow_linker'               => false,
-        'enable_display_advertising' => false,
-        'anonymize_ip'               => false,
-        'script'                     => 'google-analytics-ga',
-    ),
-    'service_manager'  => array(
-        'aliases'    => array(
-            'google-analytics'           => 'LaminasGoogleAnalytics\Analytics\Tracker',
-            'google-analytics-universal' => 'LaminasGoogleAnalytics\View\Helper\Script\Analyticsjs',
-            'google-analytics-ga'        => 'LaminasGoogleAnalytics\View\Helper\Script\Gajs',
-        ),
-        'invokables' => array(
-            'LaminasGoogleAnalytics\View\Helper\Script\Analyticsjs' => 'LaminasGoogleAnalytics\View\Helper\Script\Analyticsjs',
-            'LaminasGoogleAnalytics\View\Helper\Script\Gajs'        => 'LaminasGoogleAnalytics\View\Helper\Script\Gajs',
-        ),
-        'factories'  => array(
-            'LaminasGoogleAnalytics\Analytics\Tracker'     => 'LaminasGoogleAnalytics\Service\TrackerFactory',
-            'LaminasGoogleAnalytics\Service\ScriptFactory' => 'LaminasGoogleAnalytics\Service\ScriptFactory',
-        ),
-    ),
-    'view_helpers'     => array(
-        'factories' => array(
-            'googleAnalytics' => 'LaminasGoogleAnalytics\Service\GoogleAnalyticsFactory',
-        ),
-    )
-);
+use LaminasGoogleAnalytics\Analytics\Tracker;
+use LaminasGoogleAnalytics\Service\GoogleAnalyticsFactory;
+use LaminasGoogleAnalytics\Service\ScriptFactory;
+use LaminasGoogleAnalytics\Service\TrackerFactory;
+use LaminasGoogleAnalytics\View\Helper\Script\Analyticsjs;
+use LaminasGoogleAnalytics\View\Helper\Script\Gajs;
+
+return [
+    'google_analytics' =>
+        [
+            'enable' => true,
+            'id' => '',
+            'domain_name' => '',
+            'allow_linker' => false,
+            'enable_display_advertising' => false,
+            'anonymize_ip' => false,
+            'script' => 'google-analytics-ga'
+        ],
+    'service_manager' => [
+        'aliases' => [
+            'google-analytics' => Tracker::class,
+            'google-analytics-universal' => Analyticsjs::class,
+            'google-analytics-ga' => Gajs::class
+        ],
+        'invokables' => [
+            Analyticsjs::class => Analyticsjs::class,
+            Gajs::class => Gajs::class
+        ],
+        'factories' => [
+            Tracker::class => TrackerFactory::class,
+            ScriptFactory::class => ScriptFactory::class
+        ]
+    ],
+    'view_helpers' => ['factories' => ['googleAnalytics' => GoogleAnalyticsFactory::class]]
+];

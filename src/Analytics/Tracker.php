@@ -7,22 +7,28 @@ use LaminasGoogleAnalytics\Exception\InvalidArgumentException;
 
 class Tracker
 {
-    protected string $id;
+    protected bool $enableTracking = true;
 
-    protected bool  $enableTracking           = true;
-    protected bool  $enablePageTracking       = true;
-    protected bool  $allowLinker              = false;
-    protected bool  $enableDisplayAdvertising = false;
-    protected       $domainName;
-    protected bool  $anonymizeIp              = false;
-    protected array $customVariables          = array();
-    protected array $events                   = array();
-    protected array $transactions             = array();
-    protected       $pageUrl;
+    protected bool $enablePageTracking = true;
 
-    public function __construct($id)
+    protected bool $allowLinker = false;
+
+    protected bool $enableDisplayAdvertising = false;
+
+    protected ?string $domainName = null;
+
+    protected bool $anonymizeIp = false;
+
+    protected array $customVariables = [];
+
+    protected array $events = [];
+
+    protected array $transactions = [];
+
+    protected ?string $pageUrl = null;
+
+    public function __construct(protected string $id)
     {
-        $this->setId($id);
     }
 
     public function getId(): string
@@ -32,7 +38,7 @@ class Tracker
 
     public function setId($id): void
     {
-        $this->id = (string) $id;
+        $this->id = (string)$id;
     }
 
     public function enabled(): bool
@@ -42,7 +48,7 @@ class Tracker
 
     public function setEnableTracking($enable_tracking = true): void
     {
-        $this->enableTracking = (bool) $enable_tracking;
+        $this->enableTracking = (bool)$enable_tracking;
     }
 
     public function enabledPageTracking(): bool
@@ -52,12 +58,12 @@ class Tracker
 
     public function setEnablePageTracking($enable_page_tracking = true): void
     {
-        $this->enablePageTracking = (bool) $enable_page_tracking;
+        $this->enablePageTracking = (bool)$enable_page_tracking;
     }
 
     public function setAllowLinker($allow_linker): void
     {
-        $this->allowLinker = (bool) $allow_linker;
+        $this->allowLinker = (bool)$allow_linker;
     }
 
     public function getAllowLinker(): bool
@@ -75,24 +81,26 @@ class Tracker
         return $this->enableDisplayAdvertising;
     }
 
-    public function setDomainName($domain_name): void
-    {
-        $this->domainName = (string) $domain_name;
-    }
-
-    public function getDomainName()
+    public function getDomainName(): ?string
     {
         return $this->domainName;
     }
 
-    public function setPageUrl($pageUrl): void
+    public function setDomainName(?string $domainName): Tracker
     {
-        $this->pageUrl = $pageUrl;
+        $this->domainName = $domainName;
+        return $this;
     }
 
-    public function getPageUrl()
+    public function getPageUrl(): ?string
     {
         return $this->pageUrl;
+    }
+
+    public function setPageUrl(?string $pageUrl): Tracker
+    {
+        $this->pageUrl = $pageUrl;
+        return $this;
     }
 
     public function clearDomainName(): void
@@ -107,7 +115,7 @@ class Tracker
 
     public function setAnonymizeIp($flag): void
     {
-        $this->anonymizeIp = (bool) $flag;
+        $this->anonymizeIp = (bool)$flag;
     }
 
     public function getCustomVariables(): array
@@ -119,10 +127,12 @@ class Tracker
     {
         $index = $variable->getIndex();
         if (array_key_exists($index, $this->customVariables)) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot add custom variable with index %d, it already exists',
-                $index
-            ));
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot add custom variable with index %d, it already exists',
+                    $index
+                )
+            );
         }
 
         $this->customVariables[$index] = $variable;
@@ -147,10 +157,12 @@ class Tracker
     {
         $id = $transaction->getId();
         if (array_key_exists($id, $this->transactions)) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot add transaction with id %s, it already exists',
-                $id
-            ));
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot add transaction with id %s, it already exists',
+                    $id
+                )
+            );
         }
         $this->transactions[$id] = $transaction;
     }
