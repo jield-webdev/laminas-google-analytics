@@ -17,19 +17,25 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": "^8.0 || ^8.1",
-    "laminas/laminas-mvc": "^3.4",
-    "laminas/laminas-json": "^3.4",
-    "laminas/laminas-view": "^2.22"
+    "php": "^8.0 || ^8.1 || ^8.2",
+    "laminas/laminas-mvc": "^3.6",
+    "laminas/laminas-json": "^3.5",
+    "laminas/laminas-view": "^2.28"
   },
   "require-dev": {
-    "iteaoffice/testing": "^v3.4",
-    "rector/rector": "~0.13"
+    "iteaoffice/testing": "^v3.5",
+    "rector/rector": "~0.15"
   },
   "config": {
     "vendor-dir": "vendor",
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.0-dev",
+      "dev-develop": "2.0-dev"
     }
   },
   "autoload": {
@@ -50,7 +56,7 @@
       "@cs-fix"
     ],
     "php-lint": "./vendor/bin/parallel-lint src",
-    "phpstan": "./vendor/bin/phpstan analyse src/ --level=1",
+    "phpstan": "./vendor/bin/phpstan analyse src/ --level=2 --memory-limit=1G",
     "cs": "./vendor/bin/phpcs -n -p --standard=PSR2 --extensions=php,twig src",
     "cbf": "./vendor/bin/phpcbf src --standard=PSR2",
     "cs-fix": "./vendor/bin/php-cs-fixer fix -v src",

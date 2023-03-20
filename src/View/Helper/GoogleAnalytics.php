@@ -32,6 +32,7 @@ class GoogleAnalytics extends AbstractHelper
     protected function getContainer()
     {
         $containerName = $this->getContainerName();
+        /** @phpstan-ignore-next-line */
         return $this->view->plugin($containerName);
     }
 
