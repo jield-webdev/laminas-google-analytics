@@ -11,8 +11,6 @@ use LaminasGoogleAnalytics\Analytics\Tracker;
 
 class Gajs implements ScriptInterface
 {
-    public const METHOD_PREFIX = '_';
-
     protected Tracker $tracker;
 
     public function setTracker(Tracker $tracker): Gajs
@@ -25,85 +23,49 @@ class Gajs implements ScriptInterface
     public function getCode(): ?string
     {
         // Do not render when tracker is disabled
-        if (!$this->tracker->enabled()) {
+        if (!$this->tracker->isEnabled()) {
             return null;
         }
 
         $script = $this->getVarCreate();
 
+        $script .= $this->getLoadScript();
+
         $script .= $this->prepareSetAccount();
-        $script .= $this->prepareSetDomain();
-        $script .= $this->prepareSetAllowLinker();
-        $script .= $this->prepareAnonymizeIp();
-        $script .= $this->prepareCustomVariables();
-        $script .= $this->prepareEnabledPageTracking();
         $script .= $this->prepareTrackEvents();
         $script .= $this->prepareTransactions();
-
-        $script .= $this->getLoadScript();
+        $script .= $this->prepareCustomVariables();
 
         return $script;
     }
 
     protected function getLoadScript(): string
     {
-        $script = 'google-analytics.com/ga.js';
-        $scheme = "'https://ssl.' : 'http://www.'";
-        if (true === $this->tracker->getEnableDisplayAdvertising()) {
-            $script = 'stats.g.doubleclick.net/dc.js';
-            $scheme = "'https://' : 'http://'";
-        }
-
         return <<<SCRIPT
-(function() {
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? $scheme) + '$script';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();\n
-SCRIPT;
+                window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());\n
+                SCRIPT;
     }
 
     protected function getVarCreate(): string
     {
-        return 'var _gaq = _gaq || [];' . "\n";
+        return '';
     }
 
-    protected function push($methodName, array $params = []): string
+    protected function push(string $methodName, array|string $values = ''): string
     {
-        array_unshift($params, self::METHOD_PREFIX . $methodName);
-        $jsArray = Encoder::encode($params);
-        return sprintf('_gaq.push(%s);' . "\n", $jsArray);
+        if (is_array($values)) {
+            $values = Encoder::encode($values);
+        } else {
+            $values = sprintf('"%s"', $values);
+        }
+        return sprintf("gtag('%s',%s);" . PHP_EOL, $methodName, $values);
     }
 
     protected function prepareSetAccount(): string
     {
-        return $this->push('setAccount', [$this->tracker->getId()]);
-    }
-
-    protected function prepareSetDomain(): string
-    {
-        $domainName = $this->tracker->getDomainName();
-
-        if ($domainName) {
-            return $this->push('setDomainName', [$domainName]);
-        }
-        return '';
-    }
-
-    protected function prepareSetAllowLinker(): string
-    {
-        if ($this->tracker->getAllowLinker()) {
-            return $this->push('setAllowLinker', [true]);
-        }
-        return '';
-    }
-
-    protected function prepareAnonymizeIp(): string
-    {
-        if ($this->tracker->getAnonymizeIp()) {
-            return $this->push('gat._anonymizeIp');
-        }
-        return '';
+        return $this->push('config', $this->tracker->getId());
     }
 
     protected function prepareCustomVariables(): string
@@ -127,19 +89,6 @@ SCRIPT;
         ];
 
         return $this->push('setCustomVar', $data);
-    }
-
-    protected function prepareEnabledPageTracking(): string
-    {
-        if ($this->tracker->enabledPageTracking()) {
-            $pageUrl = $this->tracker->getPageUrl();
-            if ($pageUrl !== null) {
-                return $this->push('trackPageview', [$pageUrl]);
-            }
-
-            return $this->push('trackPageview');
-        }
-        return '';
     }
 
     protected function prepareTrackEvents(): string

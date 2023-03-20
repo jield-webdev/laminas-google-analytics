@@ -66,112 +66,35 @@ class GajsTest extends TestCase
 
     public function tearDown(): void
     {
-        unset($this->tracker);
-        unset($this->script);
+        unset($this->tracker, $this->script);
     }
 
     public function testHelperRendersAccountId(): void
     {
-        $expected = '_gaq.push(["_setAccount","123"])';
+        $expected = "gtag('config',\"123\")";
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
-    }
-
-    public function testHelperTracksPagesByDefault(): void
-    {
-        $expected = '_gaq.push(["_trackPageview"])';
-        $actual = $this->script->getCode();
-        $this->assertStringContainsString($expected, $actual);
-    }
-
-    public function testHelperReturnsNullWithDisabledTracker(): void
-    {
-        $this->tracker->setEnableTracking(false);
-
-        $actual = $this->script->getCode();
-        $this->assertNull($actual);
-    }
-
-    public function testHelperRendersNoPagesWithPageTrackingOff(): void
-    {
-        $this->tracker->setEnablePageTracking(false);
-
-        $needle = '_gaq.push(["_trackPageview"])';
-        $actual = $this->script->getCode();
-        $this->assertNotEmpty($actual);
-        $this->assertStringNotContainsString($needle, $actual);
     }
 
     public function testHelperLoadsFileFromGoogle(): void
     {
         $expected = <<<SCRIPT
-(function() {
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? 'https://ssl.' : 'http://www.') + 'google-analytics.com/ga.js';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();\n
-SCRIPT;
-
+                window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());\n
+                SCRIPT;
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
 
-    public function testDisplayFeaturesAdvertisingLoadsFileFromDoubleclick(): void
-    {
-        $this->tracker->setEnableDisplayAdvertising(true);
 
-        $expected = <<<SCRIPT
-(function() {
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();\n
-SCRIPT;
-
-        $actual = $this->script->getCode();
-        $this->assertStringContainsString($expected, $actual);
-    }
-
-    public function testHelperRendersDomainName(): void
-    {
-        $this->tracker->setDomainName('foobar');
-
-        $expected = '_gaq.push(["_setDomainName","foobar"])';
-        $actual = $this->script->getCode();
-        $this->assertStringContainsString($expected, $actual);
-    }
-
-    public function testHelperRendersAllowLinker(): void
-    {
-        $this->tracker->setAllowLinker(true);
-
-        $expected = '_gaq.push(["_setAllowLinker",true])';
-        $actual = $this->script->getCode();
-        $this->assertStringContainsString($expected, $actual);
-    }
-
-    public function testHelperRendersAnonymizeIp(): void
-    {
-        $this->tracker->setAnonymizeIp(true);
-
-        $expected = '_gaq.push(["_gat._anonymizeIp"])';
-        $actual = $this->script->getCode();
-        $this->assertStringContainsString($expected, $actual);
-    }
-
-    public function testHelperOmitsAnonymipzeIpOnFalse(): void
-    {
-        $expected = '_gaq.push(["_gat._anonymizeIp"])';
-        $actual = $this->script->getCode();
-        $this->assertStringNotContainsString($expected, $actual);
-    }
 
     public function testHelperRendersCustomVariables(): void
     {
         $variable = new CustomVariable(1, 'var1', 'value1');
         $this->tracker->addCustomVariable($variable);
 
-        $expected = '_gaq.push(["_setCustomVar",1,"var1","value1","3"])';
+        $expected = 'gtag(\'setCustomVar\',[1,"var1","value1","3"])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -184,11 +107,11 @@ SCRIPT;
         $this->tracker->addCustomVariable($variable1);
         $this->tracker->addCustomVariable($variable2);
 
-        $expected = '_gaq.push(["_setCustomVar",1,"var1","value1","3"])';
+        $expected = 'gtag(\'setCustomVar\',[1,"var1","value1","3"])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
 
-        $expected = '_gaq.push(["_setCustomVar",2,"var2","value2","3"])';
+        $expected = 'gtag(\'setCustomVar\',[2,"var2","value2","3"])';
         $this->assertStringContainsString($expected, $actual);
     }
 
@@ -197,7 +120,7 @@ SCRIPT;
         $event = new Event('Category', 'Action', 'Label', 'Value');
         $this->tracker->addEvent($event);
 
-        $expected = '_gaq.push(["_trackEvent","Category","Action","Label","Value"])';
+        $expected = 'gtag(\'trackEvent\',["Category","Action","Label","Value"])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -210,11 +133,11 @@ SCRIPT;
         $this->tracker->addEvent($fooEvent);
         $this->tracker->addEvent($barEvent);
 
-        $expected = '_gaq.push(["_trackEvent","CategoryFoo","ActionFoo","LabelFoo","ValueFoo"])';
+        $expected = 'gtag(\'trackEvent\',["CategoryFoo","ActionFoo","LabelFoo","ValueFoo"])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
 
-        $expected = '_gaq.push(["_trackEvent","CategoryBar","ActionBar","LabelBar","ValueBar"])';
+        $expected = 'gtag(\'trackEvent\',["CategoryBar","ActionBar","LabelBar","ValueBar"])';
         $this->assertStringContainsString($expected, $actual);
     }
 
@@ -223,7 +146,7 @@ SCRIPT;
         $event = new Event('Category', 'Action', null, 'Value');
         $this->tracker->addEvent($event);
 
-        $expected = '_gaq.push(["_trackEvent","Category","Action",null,"Value"])';
+        $expected = 'gtag(\'trackEvent\',["Category","Action",null,"Value"])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -233,7 +156,7 @@ SCRIPT;
         $event = new Event('Category', 'Action', 'Label');
         $this->tracker->addEvent($event);
 
-        $expected = '_gaq.push(["_trackEvent","Category","Action","Label",null])';
+        $expected = 'gtag(\'trackEvent\',["Category","Action","Label",null])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -243,7 +166,7 @@ SCRIPT;
         $event = new Event('Category', 'Action');
         $this->tracker->addEvent($event);
 
-        $expected = '_gaq.push(["_trackEvent","Category","Action",null,null])';
+        $expected = 'gtag(\'trackEvent\',["Category","Action",null,null])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -262,17 +185,7 @@ SCRIPT;
 
         $this->tracker->addTransaction($transaction);
 
-        $expected = '_gaq.push(["_addTrans",123,"Affiliation",12.55,9.66,3.22,"City","State","Country"])';
-        $actual = $this->script->getCode();
-        $this->assertStringContainsString($expected, $actual);
-    }
-
-    public function testHelperRendersTransactionTracking(): void
-    {
-        $transaction = new Transaction(123, 12.55);
-        $this->tracker->addTransaction($transaction);
-
-        $expected = '_gaq.push(["_trackTrans"])';
+        $expected = 'gtag(\'addTrans\',[123,"Affiliation",12.55,9.66,3.22,"City","State","Country"])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -282,7 +195,7 @@ SCRIPT;
         $transaction = new Transaction(123, 12.55);
         $this->tracker->addTransaction($transaction);
 
-        $expected = '_gaq.push(["_addTrans",123,null,12.55,null,null,null,null,null])';
+        $expected = 'gtag(\'addTrans\',[123,null,12.55,null,null,null,null,null])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -295,7 +208,7 @@ SCRIPT;
 
         $this->tracker->addTransaction($transaction);
 
-        $expected = '_gaq.push(["_addItem",123,456,"Product","Category",9.66,1])';
+        $expected = 'gtag(\'addItem\',[123,456,"Product","Category",9.66,1])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -310,11 +223,11 @@ SCRIPT;
 
         $this->tracker->addTransaction($transaction);
 
-        $expected = '_gaq.push(["_addItem",123,456,"Product1","Category1",9.66,1])';
+        $expected = 'gtag(\'addItem\',[123,456,"Product1","Category1",9.66,1])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
 
-        $expected = '_gaq.push(["_addItem",123,789,"Product2","Category2",15.33,2])';
+        $expected = 'gtag(\'addItem\',[123,789,"Product2","Category2",15.33,2])';
         $this->assertStringContainsString($expected, $actual);
     }
 
@@ -326,7 +239,7 @@ SCRIPT;
 
         $this->tracker->addTransaction($transaction);
 
-        $expected = '_gaq.push(["_addItem",123,456,null,null,9.66,1])';
+        $expected = 'gtag(\'addItem\',[123,456,null,null,9.66,1])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }

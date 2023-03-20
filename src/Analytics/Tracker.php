@@ -7,18 +7,6 @@ use LaminasGoogleAnalytics\Exception\InvalidArgumentException;
 
 class Tracker
 {
-    protected bool $enableTracking = true;
-
-    protected bool $enablePageTracking = true;
-
-    protected bool $allowLinker = false;
-
-    protected bool $enableDisplayAdvertising = false;
-
-    protected ?string $domainName = null;
-
-    protected bool $anonymizeIp = false;
-
     protected array $customVariables = [];
 
     protected array $events = [];
@@ -27,7 +15,7 @@ class Tracker
 
     protected ?string $pageUrl = null;
 
-    public function __construct(protected string $id)
+    public function __construct(protected string $id, protected bool $enableTracking = true)
     {
     }
 
@@ -41,81 +29,9 @@ class Tracker
         $this->id = (string)$id;
     }
 
-    public function enabled(): bool
+    public function isEnabled(): bool
     {
         return $this->enableTracking;
-    }
-
-    public function setEnableTracking($enable_tracking = true): void
-    {
-        $this->enableTracking = (bool)$enable_tracking;
-    }
-
-    public function enabledPageTracking(): bool
-    {
-        return $this->enablePageTracking;
-    }
-
-    public function setEnablePageTracking($enable_page_tracking = true): void
-    {
-        $this->enablePageTracking = (bool)$enable_page_tracking;
-    }
-
-    public function setAllowLinker($allow_linker): void
-    {
-        $this->allowLinker = (bool)$allow_linker;
-    }
-
-    public function getAllowLinker(): bool
-    {
-        return $this->allowLinker;
-    }
-
-    public function setEnableDisplayAdvertising($enableDisplayAdvertising): void
-    {
-        $this->enableDisplayAdvertising = $enableDisplayAdvertising;
-    }
-
-    public function getEnableDisplayAdvertising(): bool
-    {
-        return $this->enableDisplayAdvertising;
-    }
-
-    public function getDomainName(): ?string
-    {
-        return $this->domainName;
-    }
-
-    public function setDomainName(?string $domainName): Tracker
-    {
-        $this->domainName = $domainName;
-        return $this;
-    }
-
-    public function getPageUrl(): ?string
-    {
-        return $this->pageUrl;
-    }
-
-    public function setPageUrl(?string $pageUrl): Tracker
-    {
-        $this->pageUrl = $pageUrl;
-        return $this;
-    }
-
-    public function clearDomainName(): void
-    {
-        $this->domainName = null;
-    }
-
-    public function getAnonymizeIp(): bool
-    {
-        return $this->anonymizeIp;
-    }
-
-    public function setAnonymizeIp($flag): void
-    {
-        $this->anonymizeIp = (bool)$flag;
     }
 
     public function getCustomVariables(): array
