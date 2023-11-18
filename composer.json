@@ -17,7 +17,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": "^8.0 || ^8.1 || ^8.2",
+    "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
     "laminas/laminas-mvc": "^3.6",
     "laminas/laminas-json": "^3.5",
     "laminas/laminas-view": "^2.28"
