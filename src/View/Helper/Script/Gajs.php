@@ -2,7 +2,6 @@
 
 namespace LaminasGoogleAnalytics\View\Helper\Script;
 
-use Laminas\Json\Encoder;
 use LaminasGoogleAnalytics\Analytics\CustomVariable;
 use LaminasGoogleAnalytics\Analytics\Ecommerce\Item;
 use LaminasGoogleAnalytics\Analytics\Ecommerce\Transaction;
@@ -58,7 +57,7 @@ class Gajs implements ScriptInterface
 
     protected function push(string $methodName, array|string $values = ''): string
     {
-        $values = is_array(value: $values) ? Encoder::encode(value: $values) : sprintf('"%s"', $values);
+        $values = is_array(value: $values) ? \json_encode(value: $values) : sprintf('"%s"', $values);
 
         return sprintf("gtag('%s',%s);" . PHP_EOL, $methodName, $values);
     }
@@ -71,7 +70,7 @@ class Gajs implements ScriptInterface
     protected function prepareCustomVariables(): string
     {
         $customVariables = $this->tracker->getCustomVariables();
-        $output = '';
+        $output          = '';
 
         foreach ($customVariables as $variable) {
             $output .= $this->prepareCustomVariable(customVariable: $variable);
@@ -115,7 +114,7 @@ class Gajs implements ScriptInterface
     protected function prepareTransactions(): string
     {
         $transactions = $this->tracker->getTransactions();
-        $output = '';
+        $output       = '';
 
         foreach ($transactions as $transaction) {
             $output .= $this->prepareTransaction(transaction: $transaction);
@@ -148,7 +147,7 @@ class Gajs implements ScriptInterface
     protected function prepareTransactionItems(Transaction $transaction): string
     {
         $output = '';
-        $items = $transaction->getItems();
+        $items  = $transaction->getItems();
 
         foreach ($items as $item) {
             $output .= $this->prepareTransactionItem(transaction: $transaction, item: $item);
