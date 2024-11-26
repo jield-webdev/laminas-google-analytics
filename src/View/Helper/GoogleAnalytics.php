@@ -33,7 +33,7 @@ class GoogleAnalytics extends AbstractHelper
     {
         $containerName = $this->getContainerName();
         /** @phpstan-ignore-next-line */
-        return $this->view->plugin($containerName);
+        return $this->view->plugin(name: $containerName);
     }
 
     public function __invoke(): GoogleAnalytics
@@ -52,7 +52,7 @@ class GoogleAnalytics extends AbstractHelper
         $container = $this->getContainer();
         if (!$container instanceof HeadScript) {
             throw new RuntimeException(
-                sprintf(
+                message: sprintf(
                     'Container %s does not extend HeadScript view helper',
                     $this->getContainerName()
                 )
@@ -67,7 +67,7 @@ class GoogleAnalytics extends AbstractHelper
 
         $code = $this->script->getCode();
 
-        if (empty($code)) {
+        if ($code === null || $code === '' || $code === '0') {
             return;
         }
 

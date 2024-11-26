@@ -10,22 +10,22 @@ return [
     'google_analytics' =>
         [
             'enable' => true,
-            'id' => '',
+            'id'     => '',
         ],
-    'service_manager' => [
-        'aliases' => [
-            'google-analytics' => Tracker::class,
+    'service_manager'  => [
+        'aliases'    => [
+            'google-analytics'    => Tracker::class,
             'google-analytics-ga' => Gajs::class
         ],
         'invokables' => [
             Gajs::class => Gajs::class
         ],
-        'factories' => [
-            Tracker::class => TrackerFactory::class,
+        'factories'  => [
+            Tracker::class       => TrackerFactory::class,
             ScriptFactory::class => ScriptFactory::class
         ]
     ],
-    'view_helpers' => [
+    'view_helpers'     => [
         'factories' => [
             'googleAnalytics' => GoogleAnalyticsFactory::class
         ]

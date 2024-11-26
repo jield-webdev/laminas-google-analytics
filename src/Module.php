@@ -8,20 +8,23 @@ use Laminas\ModuleManager\Feature\BootstrapListenerInterface;
 use Laminas\ModuleManager\Feature\ConfigProviderInterface;
 use Laminas\Mvc\MvcEvent;
 use LaminasGoogleAnalytics\View\Helper\GoogleAnalytics;
+use Override;
 
 final class Module implements
     ConfigProviderInterface,
     BootstrapListenerInterface
 {
 
+    #[Override]
     public function getConfig()
     {
         return include __DIR__ . '/../config/module.config.php';
     }
 
+    #[Override]
     public function onBootstrap(EventInterface $e): void
     {
-        $app = $e->getParam('application');
+        $app = $e->getParam(name: 'application');
 
         if (!$app->getRequest() instanceof HttpRequest) {
             return;

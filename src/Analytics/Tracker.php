@@ -13,8 +13,6 @@ class Tracker
 
     protected array $transactions = [];
 
-    protected ?string $pageUrl = null;
-
     public function __construct(protected string $id, protected bool $enableTracking = true)
     {
     }
@@ -42,9 +40,9 @@ class Tracker
     public function addCustomVariable(CustomVariable $variable): void
     {
         $index = $variable->getIndex();
-        if (array_key_exists($index, $this->customVariables)) {
+        if (array_key_exists(key: $index, array: $this->customVariables)) {
             throw new InvalidArgumentException(
-                sprintf(
+                message: sprintf(
                     'Cannot add custom variable with index %d, it already exists',
                     $index
                 )
@@ -72,14 +70,15 @@ class Tracker
     public function addTransaction(Transaction $transaction): void
     {
         $id = $transaction->getId();
-        if (array_key_exists($id, $this->transactions)) {
+        if (array_key_exists(key: $id, array: $this->transactions)) {
             throw new InvalidArgumentException(
-                sprintf(
+                message: sprintf(
                     'Cannot add transaction with id %s, it already exists',
                     $id
                 )
             );
         }
+
         $this->transactions[$id] = $transaction;
     }
 }

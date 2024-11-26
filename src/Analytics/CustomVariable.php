@@ -6,19 +6,22 @@ use LaminasGoogleAnalytics\Exception\InvalidArgumentException;
 
 class CustomVariable
 {
-    public const SCOPE_VISITOR = 1;
-    public const SCOPE_SESSION = 2;
-    public const SCOPE_PAGE_LEVEL = 3;
+    public const int SCOPE_VISITOR = 1;
 
-    protected string $scope;
+    public const int SCOPE_SESSION = 2;
+
+    public const int SCOPE_PAGE_LEVEL = 3;
+
+    protected int $scope;
 
     public function __construct(
-        protected int $index,
+        protected int    $index,
         protected string $name,
         protected string $value,
-        $scope = self::SCOPE_PAGE_LEVEL
-    ) {
-        $this->setScope($scope);
+        int              $scope = self::SCOPE_PAGE_LEVEL
+    )
+    {
+        $this->setScope(scope: $scope);
     }
 
     public function getIndex(): int
@@ -58,11 +61,11 @@ class CustomVariable
     {
         $allowed = [self::SCOPE_VISITOR, self::SCOPE_SESSION, self::SCOPE_PAGE_LEVEL];
 
-        if (!in_array($scope, $allowed, true)) {
+        if (!in_array(needle: $scope, haystack: $allowed, strict: true)) {
             throw new InvalidArgumentException(
-                sprintf(
+                message: sprintf(
                     'Invalid value given for scope. Acceptable values are: %s.',
-                    implode(', ', $allowed)
+                    implode(separator: ', ', array: $allowed)
                 )
             );
         }
@@ -72,7 +75,7 @@ class CustomVariable
         return $this;
     }
 
-    public function getScope(): string
+    public function getScope(): int
     {
         return $this->scope;
     }

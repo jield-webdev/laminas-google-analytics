@@ -3,12 +3,8 @@ name: PHP Composer
 on:
   push:
     branches:
-      - main
-      - google-analytics-4.0
+      - develop
   pull_request:
-    branches:
-      - main
-      - google-analytics-4.0
 
 jobs:
   build:
@@ -17,42 +13,31 @@ jobs:
         dependencies:
           - locked
           - highest
-        php-version:
-          - 8.0
-          - 8.1
-          - 8.2
-        operating-system:
-          - ubuntu-latest
+        php:
+          - 8.3
+          - 8.4
+        include:
+          - php-version: 8.4
+            composer-options: "--ignore-platform-reqs"
 
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: "Checkout code"
+        uses: actions/checkout@v4
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: shivammathur/setup-php@v2
         with:
           coverage: "xdebug"
-          php-version: "${{ matrix.php-version }}"
+          php-version: "${{ matrix.php }}"
           ini-values: memory_limit=-1
-          tools: composer:v2
 
-      - name: "Cache dependencies"
-        uses: "actions/cache@v2"
+      - name: "Install composer and dependencies"
+        uses: ramsey/composer-install@v3
         with:
-          path: |
-            ~/.composer/cache
-            vendor
-          key: "php-${{ matrix.php-version }}-${{ matrix.dependencies }}"
-          restore-keys: "php-${{ matrix.php-version }}-${{ matrix.dependencies }}"
-
-      - name: "Install highest dependencies"
-        if: ${{ matrix.dependencies == 'highest' }}
-        run: "composer update --no-interaction --no-progress --no-suggest --ignore-platform-req=php"
-
-      - name: "Install locked dependencies"
-        if: ${{ matrix.dependencies == 'locked' }}
-        run: "composer install --no-interaction --no-progress --no-suggest --ignore-platform-req=php"
+          dependency-versions: ${{ matrix.dependencies }}
+          composer-options: ${{ matrix.composer-options }}
 
       - name: Run Lint Checker suite
         run: composer php-lint

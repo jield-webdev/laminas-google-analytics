@@ -8,11 +8,13 @@ use LaminasGoogleAnalytics\Analytics\Ecommerce\Item;
 use LaminasGoogleAnalytics\Analytics\Ecommerce\Transaction;
 use LaminasGoogleAnalytics\Analytics\Event;
 use LaminasGoogleAnalytics\Analytics\Tracker;
+use Override;
 
 class Gajs implements ScriptInterface
 {
     protected Tracker $tracker;
 
+    #[Override]
     public function setTracker(Tracker $tracker): Gajs
     {
         $this->tracker = $tracker;
@@ -20,6 +22,7 @@ class Gajs implements ScriptInterface
         return $this;
     }
 
+    #[Override]
     public function getCode(): ?string
     {
         // Do not render when tracker is disabled
@@ -55,17 +58,14 @@ class Gajs implements ScriptInterface
 
     protected function push(string $methodName, array|string $values = ''): string
     {
-        if (is_array($values)) {
-            $values = Encoder::encode($values);
-        } else {
-            $values = sprintf('"%s"', $values);
-        }
+        $values = is_array(value: $values) ? Encoder::encode(value: $values) : sprintf('"%s"', $values);
+
         return sprintf("gtag('%s',%s);" . PHP_EOL, $methodName, $values);
     }
 
     protected function prepareSetAccount(): string
     {
-        return $this->push('config', $this->tracker->getId());
+        return $this->push(methodName: 'config', values: $this->tracker->getId());
     }
 
     protected function prepareCustomVariables(): string
@@ -74,8 +74,9 @@ class Gajs implements ScriptInterface
         $output = '';
 
         foreach ($customVariables as $variable) {
-            $output .= $this->prepareCustomVariable($variable);
+            $output .= $this->prepareCustomVariable(customVariable: $variable);
         }
+
         return $output;
     }
 
@@ -88,7 +89,7 @@ class Gajs implements ScriptInterface
             $customVariable->getScope()
         ];
 
-        return $this->push('setCustomVar', $data);
+        return $this->push(methodName: 'setCustomVar', values: $data);
     }
 
     protected function prepareTrackEvents(): string
@@ -97,16 +98,17 @@ class Gajs implements ScriptInterface
         $output = '';
 
         foreach ($events as $event) {
-            $output .= $this->prepareTrackEvent($event);
+            $output .= $this->prepareTrackEvent(event: $event);
         }
+
         return $output;
     }
 
     protected function prepareTrackEvent(Event $event): string
     {
         return $this->push(
-            'trackEvent',
-            [$event->getCategory(), $event->getAction(), $event->getLabel(), $event->getValue()]
+            methodName: 'trackEvent',
+            values: [$event->getCategory(), $event->getAction(), $event->getLabel(), $event->getValue()]
         );
     }
 
@@ -116,19 +118,21 @@ class Gajs implements ScriptInterface
         $output = '';
 
         foreach ($transactions as $transaction) {
-            $output .= $this->prepareTransaction($transaction);
+            $output .= $this->prepareTransaction(transaction: $transaction);
         }
+
         if ($output !== '') {
-            $output .= $this->push('trackTrans');
+            $output .= $this->push(methodName: 'trackTrans');
         }
+
         return $output;
     }
 
     protected function prepareTransaction(Transaction $transaction): string
     {
         return $this->push(
-                'addTrans',
-                [
+                methodName: 'addTrans',
+                values: [
                     $transaction->getId(),
                     $transaction->getAffiliation(),
                     $transaction->getTotal(),
@@ -138,7 +142,7 @@ class Gajs implements ScriptInterface
                     $transaction->getState(),
                     $transaction->getCountry()
                 ]
-            ) . $this->prepareTransactionItems($transaction);
+            ) . $this->prepareTransactionItems(transaction: $transaction);
     }
 
     protected function prepareTransactionItems(Transaction $transaction): string
@@ -147,16 +151,17 @@ class Gajs implements ScriptInterface
         $items = $transaction->getItems();
 
         foreach ($items as $item) {
-            $output .= $this->prepareTransactionItem($transaction, $item);
+            $output .= $this->prepareTransactionItem(transaction: $transaction, item: $item);
         }
+
         return $output;
     }
 
     protected function prepareTransactionItem(Transaction $transaction, Item $item): string
     {
         return $this->push(
-            'addItem',
-            [
+            methodName: 'addItem',
+            values: [
                 $transaction->getId(),
                 $item->getSku(),
                 $item->getProduct(),

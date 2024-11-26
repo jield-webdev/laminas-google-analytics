@@ -124,7 +124,7 @@ class Transaction
     public function addItem(Item $item): Transaction
     {
         $sku = $item->getSku();
-        if (array_key_exists($sku, $this->items)) {
+        if (array_key_exists(key: $sku, array: $this->items)) {
             $quantity = $this->items[$sku]->getQuantity() + $item->getQuantity();
 
             $this->items[$sku]->setQuantity($quantity);

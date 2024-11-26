@@ -5,14 +5,16 @@ namespace LaminasGoogleAnalytics\Service;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use LaminasGoogleAnalytics\Analytics\Tracker;
+use Override;
 
 final class TrackerFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): Tracker
+    #[Override]
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Tracker
     {
-        $config = $container->get('config');
+        $config   = $container->get('config');
         $gaConfig = $config['google_analytics'];
 
-        return new Tracker($gaConfig['id'], $gaConfig['enable']);
+        return new Tracker(id: $gaConfig['id'], enableTracking: $gaConfig['enable']);
     }
 }

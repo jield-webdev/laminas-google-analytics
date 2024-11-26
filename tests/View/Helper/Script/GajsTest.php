@@ -94,7 +94,7 @@ class GajsTest extends TestCase
         $variable = new CustomVariable(1, 'var1', 'value1');
         $this->tracker->addCustomVariable($variable);
 
-        $expected = 'gtag(\'setCustomVar\',[1,"var1","value1","3"])';
+        $expected = 'gtag(\'setCustomVar\',[1,"var1","value1",3])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
     }
@@ -107,11 +107,11 @@ class GajsTest extends TestCase
         $this->tracker->addCustomVariable($variable1);
         $this->tracker->addCustomVariable($variable2);
 
-        $expected = 'gtag(\'setCustomVar\',[1,"var1","value1","3"])';
+        $expected = 'gtag(\'setCustomVar\',[1,"var1","value1",3])';
         $actual = $this->script->getCode();
         $this->assertStringContainsString($expected, $actual);
 
-        $expected = 'gtag(\'setCustomVar\',[2,"var2","value2","3"])';
+        $expected = 'gtag(\'setCustomVar\',[2,"var2","value2",3])';
         $this->assertStringContainsString($expected, $actual);
     }
 
